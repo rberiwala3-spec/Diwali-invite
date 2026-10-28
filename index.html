@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>No Buri Nazar – Diwali House Party</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#FF2E93; --pink-deep:#E8137A; --red:#E0102F; --green:#16C23A; --green-deep:#0E9A2C;
+  --yellow:#FFD21F; --cream:#FFF6E3; --ink:#5A0020; --bg:#FF3D9A;
+  --display:"Bowlby One","Arial Black",Impact,system-ui,sans-serif;
+  --body:"Baloo 2","Nirmala UI","Mangal",system-ui,sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#F0217F; --cream:#FFF2D6; color-scheme: dark; }
+}
+:root[data-theme="dark"]{ --bg:#F0217F; --cream:#FFF2D6; color-scheme: dark; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--red)}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--body); color:var(--ink);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,210,31,.35), transparent 55%),
+    var(--red);
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+/* phone-only column */
+.phone{
+  position:relative; max-width:430px; min-height:100%; margin:0 auto; overflow:hidden;
+  background:
+    radial-gradient(rgba(224,16,47,.22) 1.2px, transparent 1.7px) 0 0/7px 7px,
+    var(--bg);
+  box-shadow:0 0 0 6px var(--yellow), 0 0 0 12px var(--green);
+}
+.phone::after{ /* paper grain */
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:50; opacity:.28; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .1  0 0 0 0 .25  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.mute{position:fixed; z-index:70; top:calc(env(safe-area-inset-top,0px) + 12px); right:max(12px, calc(50vw - 215px + 12px));
+  width:46px; height:46px; border-radius:50%; border:3px solid var(--ink); background:var(--yellow); font-size:22px; line-height:1; cursor:pointer; box-shadow:3px 3px 0 var(--ink)}
+.mute[hidden]{display:none}
+.mute:focus-visible{outline:4px solid var(--cream); outline-offset:2px}
+canvas#fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:40}
+
+/* ---------- gate ---------- */
+.gate{
+  position:relative; z-index:5; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:18px 20px 28px; text-align:center;
+  transition:opacity .5s ease, transform .5s ease;
+}
+.gate.gone{opacity:0; transform:scale(1.08); pointer-events:none}
+.burst-bg{position:fixed; left:50%; top:50%; width:170vmax; height:170vmax; transform:translate(-50%,-50%); z-index:-1; opacity:.9; animation:spin 60s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.gate-girl{width:84px; margin-bottom:6px; filter:drop-shadow(4px 5px 0 rgba(90,0,32,.55)); animation:bob 3s ease-in-out infinite}
+.gate-hi{font-family:var(--display); color:var(--yellow); font-size:20px; letter-spacing:.02em; margin:0;
+  text-shadow:2px 2px 0 var(--red), 4px 4px 0 var(--ink); transform:rotate(-3deg)}
+.gate h1{font-family:var(--display); font-size:38px; line-height:.95; margin:10px 0 4px; color:var(--cream);
+  text-shadow:3px 3px 0 var(--red), 6px 6px 0 var(--ink); transform:rotate(-3deg)}
+.gate p.sub{font-size:18px; font-weight:700; color:var(--cream); margin:10px 0 18px; text-shadow:1px 1px 0 var(--ink)}
+.bigcracker{appearance:none; border:0; background:none; padding:0; cursor:pointer; width:100%; max-width:300px; font:inherit; -webkit-tap-highlight-color:transparent}
+.bigcracker svg{display:block; width:100%; height:auto; overflow:visible}
+.bigcracker span{display:inline-block; margin-top:6px; font-family:var(--display); font-size:24px; color:var(--yellow); background:var(--green); padding:10px 22px 8px; border-radius:14px; outline:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); transition:transform .12s, box-shadow .12s}
+.bigcracker:active span{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--ink)}
+.bigcracker:focus-visible{outline:4px solid var(--yellow); outline-offset:6px; border-radius:16px}
+.bigcracker.busy{pointer-events:none}
+.bigcracker.busy span{opacity:0; transition:opacity .3s}
+#tipHint{transform-origin:266px 16px; animation:hint 1s ease-in-out infinite}
+@keyframes hint{50%{transform:scale(1.6); opacity:.5}}
+.bigcracker.busy #tipHint{display:none}
+.bigcracker.boom .body{animation:shake .06s linear infinite}
+.lights{display:flex; gap:14px; align-items:flex-end; justify-content:center; width:100%}
+.light{
+  appearance:none; border:0; background:var(--cream); border-radius:22px; padding:12px 10px 10px; cursor:pointer;
+  width:46%; box-shadow:5px 5px 0 var(--ink); outline:3px solid var(--ink); font:inherit; color:var(--ink);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.light:active{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--ink)}
+.light:focus-visible{outline:4px solid var(--yellow); outline-offset:3px}
+.light svg{display:block; width:100%; height:auto}
+.light span{display:block; font-weight:800; font-size:17px; margin-top:4px}
+.light.diya{background:var(--yellow)}
+.light.pataka{background:var(--green); color:var(--cream)}
+.lights.busy .light{pointer-events:none}
+.flame{transform-origin:60px 62px; transform:scale(0); transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.diya.lit .flame{transform:scale(1); animation:flick .18s ease-in-out infinite alternate .5s}
+@keyframes flick{to{transform:scale(1.08,.94) rotate(2deg)}}
+.pataka.lit .body{animation:shake .08s linear infinite 1.1s}
+@keyframes shake{0%{transform:translate(0,0)}50%{transform:translate(1.5px,-1px)}100%{transform:translate(-1.5px,1px)}}
+.flash{position:fixed; inset:0; background:var(--cream); z-index:60; opacity:0; pointer-events:none}
+.flash.go{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:0}15%{opacity:.95}100%{opacity:0}}
+
+/* ---------- invite ---------- */
+.invite{position:relative; z-index:5; display:none; padding:22px 18px 40px}
+.invite.on{display:block}
+.reveal > *{opacity:0; transform:translateY(24px) scale(.96)}
+.invite.on.reveal > *{animation:pop .6s cubic-bezier(.2,1.4,.4,1) forwards}
+.invite.on.reveal > *:nth-child(2){animation-delay:.12s}
+.invite.on.reveal > *:nth-child(3){animation-delay:.24s}
+.invite.on.reveal > *:nth-child(4){animation-delay:.36s}
+.invite.on.reveal > *:nth-child(n+5){animation-delay:.48s}
+@keyframes pop{to{opacity:1; transform:none}}
+
+.headline{position:relative; text-align:center; margin:6px 0 14px}
+.headline .small{font-family:var(--display); font-size:19px; color:var(--cream); display:inline-block; transform:rotate(-4deg);
+  background:var(--red); padding:4px 12px 2px; border-radius:6px; box-shadow:3px 3px 0 var(--ink)}
+.headline h2{font-family:var(--display); font-size:58px; line-height:.88; margin:12px 0 0; color:var(--yellow);
+  -webkit-text-stroke:2px var(--red); text-shadow:4px 4px 0 var(--red), 8px 8px 0 var(--ink); transform:rotate(-4deg)}
+.headline h2 i{font-style:normal; display:block; font-size:34px; color:var(--cream); -webkit-text-stroke:0; margin-bottom:4px}
+
+.nimbu{display:block; width:100%; max-width:320px; margin:4px auto 0; overflow:visible}
+.nimbu .swing{transform-origin:150px 0; animation:sway 3.4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.poster{display:block; width:100%; border-radius:10px; border:4px solid var(--ink); box-shadow:7px 7px 0 var(--green)}
+.poster.tilt-l{transform:rotate(-2deg)} .poster.tilt-r{transform:rotate(1.6deg)}
+
+.because{text-align:center; margin:30px 4px 18px}
+.because p{font-family:var(--display); font-size:27px; line-height:1.05; margin:0; color:var(--cream); text-shadow:3px 3px 0 var(--ink)}
+.because .hi{display:inline-block; color:var(--yellow); font-family:var(--body); font-weight:800; font-size:56px; line-height:1; margin:2px 0 -6px;
+  text-shadow:3px 3px 0 var(--red), 6px 6px 0 var(--ink)}
+
+.ticket{
+  position:relative; margin:110px 0 0; background:var(--cream); border-radius:18px; padding:20px 18px 18px 18px;
+  outline:3px solid var(--ink); box-shadow:8px 8px 0 var(--red);
+}
+.ticket::before,.ticket::after{content:""; position:absolute; top:50%; width:24px; height:24px; border-radius:50%; background:var(--bg); outline:3px solid var(--ink); transform:translateY(-50%)}
+.ticket::before{left:-14px} .ticket::after{right:-14px}
+.ticket .girl{position:absolute; right:-6px; top:-92px; width:150px; filter:drop-shadow(4px 5px 0 rgba(90,0,32,.55)); animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-1.5deg)}}
+.ticket .label{font-weight:800; font-size:15px; color:var(--pink-deep); margin:0}
+.ticket h3{font-family:var(--display); font-size:30px; line-height:1; margin:2px 0 14px; color:var(--red); max-width:58%}
+.facts{display:grid; grid-template-columns:auto 1fr; gap:10px 12px; align-items:center; margin:0; font-size:19px}
+.facts dt{width:40px; height:40px; border-radius:12px; display:grid; place-items:center; font-size:20px; background:var(--pink); outline:2.5px solid var(--ink)}
+.facts dt:nth-of-type(2){background:var(--green)} .facts dt:nth-of-type(3){background:var(--yellow)}
+.facts dd{margin:0; font-weight:800; line-height:1.15}
+.facts dd small{display:block; font-weight:600; font-size:15px; color:#8A1F4A}
+
+/* ---------- RSVP ---------- */
+.rsvp{margin-top:30px; background:var(--green); border-radius:18px; padding:20px 18px; outline:3px solid var(--ink); box-shadow:8px 8px 0 var(--yellow); color:var(--cream)}
+.rsvp h3{font-family:var(--display); font-size:28px; line-height:1; margin:0 0 4px; text-shadow:2px 2px 0 var(--ink)}
+.rsvp .hint{margin:0 0 14px; font-weight:600; font-size:16px}
+.rsvp label{display:block; font-weight:800; font-size:16px; margin:12px 0 6px}
+.rsvp input[type=text]{width:100%; font:inherit; font-size:20px; font-weight:700; padding:12px 14px; border-radius:12px; border:3px solid var(--ink); background:var(--cream); color:var(--ink)}
+.rsvp input:focus-visible,.seg button:focus-visible,.step button:focus-visible,.cta:focus-visible{outline:4px solid var(--yellow); outline-offset:2px}
+.seg{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.seg button{font:inherit; font-weight:800; font-size:16px; padding:11px 6px; border-radius:12px; border:3px solid var(--ink); background:var(--cream); color:var(--ink); cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--yellow); box-shadow:inset 0 -4px 0 var(--red)}
+.step{display:flex; align-items:center; gap:10px}
+.step button{width:46px; height:46px; border-radius:50%; border:3px solid var(--ink); background:var(--yellow); font:inherit; font-size:26px; font-weight:800; color:var(--ink); cursor:pointer; line-height:1}
+.step output{min-width:44px; text-align:center; font-family:var(--display); font-size:30px; text-shadow:2px 2px 0 var(--ink)}
+.cta{display:block; width:100%; margin-top:18px; font-family:var(--display); font-size:22px; padding:14px; border-radius:14px; border:3px solid var(--ink);
+  background:var(--red); color:var(--yellow); box-shadow:5px 5px 0 var(--ink); cursor:pointer; text-decoration:none; text-align:center}
+.cta:active{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--ink)}
+.cta.alt{background:var(--yellow); color:var(--ink); font-size:18px}
+.msg{margin:12px 0 0; font-weight:700; min-height:1em}
+.done{display:none; text-align:center}
+.done.on{display:block}
+.done big{display:block; font-family:var(--display); font-size:30px; line-height:1.05; text-shadow:3px 3px 0 var(--ink)}
+.done p{font-weight:700; font-size:17px; margin:8px 0 0}
+.done button.link{background:none; border:0; color:var(--yellow); font:inherit; font-weight:800; text-decoration:underline; cursor:pointer; margin-top:10px}
+
+.footer{text-align:center; margin:34px 0 0; color:var(--cream); font-weight:700; font-size:15px}
+.footer .tap{opacity:.9}
+.hostlink{display:none; margin-top:10px; color:var(--yellow); font-weight:800}
+.hostlink.on{display:inline-block}
+
+/* ---------- guest list (#guests) ---------- */
+.guests{display:none; position:relative; z-index:5; padding:24px 18px 40px}
+.guests.on{display:block}
+.guests h2{font-family:var(--display); font-size:40px; line-height:.95; color:var(--yellow); text-shadow:3px 3px 0 var(--red), 6px 6px 0 var(--ink); margin:6px 0 16px; transform:rotate(-2deg)}
+.tally{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px}
+.tally div{background:var(--cream); border-radius:14px; outline:3px solid var(--ink); padding:10px 8px; text-align:center; box-shadow:4px 4px 0 var(--green)}
+.tally b{display:block; font-family:var(--display); font-size:30px; color:var(--red)}
+.tally span{font-weight:700; font-size:14px}
+.glist{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.glist li{background:var(--cream); border-radius:14px; outline:3px solid var(--ink); padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.glist li.no{background:#FFD0E6}
+.glist .n{font-weight:800; font-size:19px}
+.glist .m{font-weight:600; font-size:14px; color:#8A1F4A}
+.glist .badge{font-weight:800; font-size:14px; padding:4px 10px; border-radius:99px; background:var(--green); color:var(--cream); white-space:nowrap}
+.glist li.no .badge{background:var(--red)}
+.empty{background:var(--cream); border-radius:14px; outline:3px solid var(--ink); padding:18px; font-weight:700}
+.back{display:inline-block; margin-top:18px; color:var(--cream); font-weight:800}
+
+@media (prefers-reduced-motion: reduce){
+  .burst-bg,.ticket .girl,.gate-girl,.nimbu .swing,#tipHint{animation:none}
+  .invite.on.reveal > *{animation:none; opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="stk" x="-20%" y="-20%" width="140%" height="140%">
+    <feMorphology in="SourceAlpha" operator="dilate" radius="9" result="o2"/>
+    <feFlood flood-color="#5A0020"/><feComposite in2="o2" operator="in" result="ink"/>
+    <feMorphology in="SourceAlpha" operator="dilate" radius="6" result="o1"/>
+    <feFlood flood-color="#FFD21F"/><feComposite in2="o1" operator="in" result="gold"/>
+    <feMerge><feMergeNode in="ink"/><feMergeNode in="gold"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <radialGradient id="skin" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#FFF0E6"/><stop offset="1" stop-color="#FFC9B5"/></radialGradient>
+  <radialGradient id="lglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFF6A0"/><stop offset="1" stop-color="#FFD21F"/></radialGradient>
+</defs>
+</defs><defs><g id="girlArt" filter="url(#stk)">
+  <!-- lantern -->
+  <path d="M52 196 V224" stroke="#5A0020" stroke-width="2"/>
+  <g stroke="#5A0020" stroke-width="2" stroke-linejoin="round">
+    <path d="M36 226 H68 L76 250 L66 276 H38 L28 250Z" fill="#E0102F"/>
+    <path d="M44 232 H60 L66 250 L59 270 H45 L38 250Z" fill="url(#lglow)"/>
+    <path d="M36 226 H68 L64 220 H40Z" fill="#FF2E93"/>
+  </g>
+  <g stroke="#16C23A" stroke-width="3" stroke-linecap="round">
+    <path d="M42 278 V300"/><path d="M48 278 V306"/><path d="M56 278 V306"/><path d="M62 278 V300"/>
+  </g>
+  <!-- pallu drape behind -->
+  <path d="M146 148 Q170 170 180 250 L160 254 Q154 190 138 160Z" fill="#16C23A" stroke="#5A0020" stroke-width="2"/>
+  <!-- skirt -->
+  <path d="M80 196 H160 L184 318 Q120 334 56 318Z" fill="#E0102F" stroke="#5A0020" stroke-width="2.5"/>
+  <path d="M60 306 Q120 322 180 306" fill="none" stroke="#FFD21F" stroke-width="8"/>
+  <path d="M60 306 Q120 322 180 306" fill="none" stroke="#16C23A" stroke-width="2" stroke-dasharray="3 5"/>
+  <g stroke="#A8001F" stroke-width="2"><path d="M110 220 L102 300"/><path d="M120 220 L120 304"/><path d="M130 220 L138 300"/></g>
+  <g fill="#FFD21F"><circle cx="86" cy="250" r="2.5"/><circle cx="152" cy="250" r="2.5"/><circle cx="80" cy="280" r="2.5"/><circle cx="160" cy="282" r="2.5"/><circle cx="96" cy="226" r="2"/><circle cx="146" cy="226" r="2"/></g>
+  <!-- feet -->
+  <ellipse cx="102" cy="326" rx="12" ry="6" fill="#FF2E93" stroke="#5A0020" stroke-width="2"/>
+  <ellipse cx="138" cy="326" rx="12" ry="6" fill="#FF2E93" stroke="#5A0020" stroke-width="2"/>
+  <!-- blouse -->
+  <path d="M86 150 Q120 138 154 150 L160 202 H80Z" fill="#FF2E93" stroke="#5A0020" stroke-width="2.5"/>
+  <!-- pallu across -->
+  <path d="M90 146 L118 142 L168 210 L150 224Z" fill="#16C23A" stroke="#5A0020" stroke-width="2"/>
+  <path d="M118 142 L168 210" stroke="#FFD21F" stroke-width="4"/>
+  <g fill="#FFD21F"><circle cx="122" cy="168" r="2"/><circle cx="136" cy="190" r="2"/><circle cx="110" cy="160" r="2"/></g>
+  <!-- left arm with lantern -->
+  <path d="M90 158 Q66 172 54 194" stroke="#FF2E93" stroke-width="18" stroke-linecap="round" fill="none"/>
+  <path d="M74 172 Q62 184 54 194" stroke="url(#skin)" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <path d="M64 183 l-6 -5 M60 188 l-6 -5" stroke="#FFD21F" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="53" cy="196" r="8" fill="url(#skin)" stroke="#5A0020" stroke-width="1.5"/>
+  <!-- money fan -->
+  <g stroke="#5A0020" stroke-width="2" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="9" fill="#5A0020">
+    <g transform="translate(156 160) rotate(-38)"><rect x="-28" y="-13" width="56" height="26" rx="2" fill="#7EE07A"/><rect x="-24" y="-9" width="48" height="18" fill="none" stroke-width="1"/><circle cx="12" cy="0" r="6" fill="#C9F7C0" stroke-width="1"/><text x="-21" y="4" stroke="none">₹500</text></g>
+    <g transform="translate(156 164) rotate(-20)"><rect x="-28" y="-13" width="56" height="26" rx="2" fill="#FF8FCB"/><rect x="-24" y="-9" width="48" height="18" fill="none" stroke-width="1"/><circle cx="12" cy="0" r="6" fill="#FFD0E8" stroke-width="1"/><text x="-21" y="4" stroke="none">₹2000</text></g>
+    <g transform="translate(154 172) rotate(4)"><rect x="-28" y="-13" width="56" height="26" rx="2" fill="#FF8FCB"/><rect x="-24" y="-9" width="48" height="18" fill="none" stroke-width="1"/><circle cx="12" cy="0" r="6" fill="#FFD0E8" stroke-width="1"/><text x="-21" y="4" stroke="none">₹2000</text></g>
+  </g>
+  <!-- right arm hugging notes -->
+  <path d="M152 156 Q162 176 144 190" stroke="#FF2E93" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <ellipse cx="140" cy="188" rx="11" ry="8" fill="url(#skin)" stroke="#5A0020" stroke-width="1.5"/>
+  <path d="M144 194 l8 -3" stroke="#FFD21F" stroke-width="3" stroke-linecap="round"/>
+  <!-- neck + necklace -->
+  <rect x="111" y="128" width="18" height="18" fill="url(#skin)"/>
+  <path d="M104 142 Q120 158 136 142" fill="none" stroke="#FFD21F" stroke-width="4"/>
+  <circle cx="120" cy="152" r="4" fill="#16C23A" stroke="#FFD21F" stroke-width="2"/>
+  <!-- ears + jhumkas -->
+  <circle cx="75" cy="102" r="8" fill="url(#skin)" stroke="#5A0020" stroke-width="1.5"/>
+  <circle cx="165" cy="102" r="8" fill="url(#skin)" stroke="#5A0020" stroke-width="1.5"/>
+  <g fill="#FFD21F" stroke="#5A0020" stroke-width="1.2"><path d="M70 112 h10 l3 9 h-16Z"/><path d="M160 112 h10 l3 9 h-16Z"/></g>
+  <g fill="#E0102F"><circle cx="70" cy="124" r="2"/><circle cx="75" cy="125" r="2"/><circle cx="80" cy="124" r="2"/><circle cx="160" cy="124" r="2"/><circle cx="165" cy="125" r="2"/><circle cx="170" cy="124" r="2"/></g>
+  <!-- face -->
+  <circle cx="120" cy="96" r="46" fill="url(#skin)" stroke="#5A0020" stroke-width="2"/>
+  <!-- hair buns + hair -->
+  <circle cx="80" cy="52" r="20" fill="#3B0614"/>
+  <circle cx="160" cy="52" r="20" fill="#3B0614"/>
+  <path d="M74 100 Q70 46 120 46 Q170 46 166 100 Q158 70 126 66 L120 74 L114 66 Q82 70 74 100Z" fill="#3B0614"/>
+  <!-- flowers -->
+  <g>
+    <circle cx="66" cy="40" r="10" fill="#FF7A00"/><circle cx="66" cy="40" r="6" fill="#FFD21F"/>
+    <circle cx="86" cy="34" r="7" fill="#E0102F"/><circle cx="86" cy="34" r="3" fill="#FFD21F"/>
+    <circle cx="176" cy="42" r="10" fill="#FF7A00"/><circle cx="176" cy="42" r="6" fill="#FFD21F"/>
+    <circle cx="156" cy="32" r="7" fill="#E0102F"/><circle cx="156" cy="32" r="3" fill="#FFD21F"/>
+    <path d="M58 52 q-8 2 -10 10 q8 0 10 -10Z M184 54 q8 2 10 10 q-8 0 -10 -10Z" fill="#16C23A"/>
+  </g>
+  <!-- maang tikka + bindi -->
+  <path d="M120 70 V80" stroke="#FFD21F" stroke-width="2"/><circle cx="120" cy="82" r="3" fill="#FFD21F" stroke="#E0102F" stroke-width="1.2"/>
+  <circle cx="120" cy="92" r="3.4" fill="#E0102F"/>
+  <!-- brows -->
+  <path d="M94 88 Q102 83 110 87 M130 87 Q138 83 146 88" stroke="#3B0614" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <!-- eyes -->
+  <g>
+    <ellipse cx="102" cy="104" rx="8.5" ry="10.5" fill="#2A0010"/>
+    <ellipse cx="138" cy="104" rx="8.5" ry="10.5" fill="#2A0010"/>
+    <circle cx="105" cy="100" r="3.2" fill="#fff"/><circle cx="141" cy="100" r="3.2" fill="#fff"/>
+    <circle cx="99" cy="108" r="1.6" fill="#fff"/><circle cx="135" cy="108" r="1.6" fill="#fff"/>
+    <path d="M92 98 l-5 -3 M93 102 l-6 -1 M148 98 l5 -3 M147 102 l6 -1" stroke="#2A0010" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- cheeks, nose, nath, lips -->
+  <circle cx="94" cy="122" r="9" fill="#FF5FAE" opacity=".45"/>
+  <circle cx="146" cy="122" r="9" fill="#FF5FAE" opacity=".45"/>
+  <path d="M118 114 q2 3 4 0" stroke="#C0647A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <circle cx="125" cy="117" r="3.2" fill="none" stroke="#FFD21F" stroke-width="1.6"/>
+  <path d="M113 127 Q116 123 120 126 Q124 123 127 127 Q120 133 113 127Z" fill="#E0102F"/>
+</g></defs></svg>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="flash" id="flash"></div>
+<button class="mute" id="mute" type="button" aria-label="Mute sound" hidden>🔊</button>
+<main class="phone">
+
+  <!-- ===== GATE ===== -->
+  <section class="gate" id="gate">
+    <svg class="burst-bg" viewBox="-100 -100 200 200" aria-hidden="true">
+      <g id="rays"></g>
+    </svg>
+    <svg class="gate-girl" viewBox="0 0 240 340" aria-hidden="true"><use href="#girlArt"/></svg>
+    <p class="gate-hi">Psst… you’ve got mail!</p>
+    <h1>Light it up to open your invite</h1>
+    <p class="sub">Tap the पटाखा to light its wick</p>
+    <button class="bigcracker" id="btnPataka" aria-label="Light the pataka to open the invite">
+      <svg id="crackerSvg" viewBox="0 0 300 330" aria-hidden="true">
+        <defs>
+          <pattern id="dotsY" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.4" fill="#E0102F" opacity=".35"/></pattern>
+          <radialGradient id="tipGlow"><stop offset="0" stop-color="#FFF6A0"/><stop offset=".45" stop-color="#FFD21F" stop-opacity=".7"/><stop offset="1" stop-color="#FFD21F" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g class="body">
+          <!-- wick: long braided curl -->
+          <path id="fuseBase" d="M150 168 C150 128 104 128 102 92 C100 58 150 44 176 66 C198 84 236 70 236 40 C236 20 252 10 266 16" fill="none" stroke="#5A0020" stroke-width="11" stroke-linecap="round"/>
+          <path id="fuse" d="M150 168 C150 128 104 128 102 92 C100 58 150 44 176 66 C198 84 236 70 236 40 C236 20 252 10 266 16" fill="none" stroke="#FFD21F" stroke-width="6" stroke-linecap="round"/>
+          <path id="fuseBraid" d="M150 168 C150 128 104 128 102 92 C100 58 150 44 176 66 C198 84 236 70 236 40 C236 20 252 10 266 16" fill="none" stroke="#E0102F" stroke-width="6" stroke-dasharray="4 6"/>
+          <g id="tipHint"><circle cx="266" cy="16" r="16" fill="url(#tipGlow)"/></g>
+          <!-- cracker body -->
+          <ellipse cx="150" cy="316" rx="78" ry="10" fill="#5A0020" opacity=".35"/>
+          <rect x="74" y="168" width="152" height="146" rx="16" fill="#E0102F" stroke="#5A0020" stroke-width="6"/>
+          <rect x="77" y="168" width="146" height="146" rx="14" fill="url(#dotsY)"/>
+          <rect x="74" y="190" width="152" height="18" fill="#FFD21F" stroke="#5A0020" stroke-width="3"/>
+          <rect x="74" y="276" width="152" height="18" fill="#16C23A" stroke="#5A0020" stroke-width="3"/>
+          <g fill="#FFD21F" stroke="#5A0020" stroke-width="2">
+            <path d="M150 218 l7 14 15 1 -12 9 4 15 -14 -8 -14 8 4 -15 -12 -9 15 -1Z"/>
+          </g>
+          <text x="150" y="204" text-anchor="middle" font-family="Baloo 2, Nirmala UI, Mangal, sans-serif" font-weight="800" font-size="15" fill="#5A0020">पटाखा</text>
+          <g fill="#FF2E93"><circle cx="98" cy="240" r="5"/><circle cx="202" cy="240" r="5"/><circle cx="108" cy="262" r="3"/><circle cx="192" cy="262" r="3"/></g>
+          <ellipse cx="150" cy="168" rx="76" ry="14" fill="#FF2E93" stroke="#5A0020" stroke-width="6"/>
+          <ellipse cx="150" cy="168" rx="20" ry="5" fill="#5A0020"/>
+        </g>
+        <g id="spark" opacity="0">
+          <circle r="16" fill="url(#tipGlow)"/>
+          <circle r="6" fill="#FFF6E3"/>
+          <g stroke="#FFD21F" stroke-width="3" stroke-linecap="round">
+            <path d="M0-11V-20M0 11V20M-11 0H-20M11 0H20M-8-8L-14-14M8 8L14 14M8-8L14-14M-8 8L-14 14"/>
+          </g>
+        </g>
+      </svg>
+      <span>Light the pataka</span>
+    </button>
+  </section>
+
+  <!-- ===== INVITE ===== -->
+  <section class="invite" id="invite" aria-live="polite">
+    <div class="headline">
+      <span class="small">Hojaye phir?</span>
+      <h2><i>No more</i>Buri Nazar this Diwali</h2>
+    </div>
+
+    <svg class="nimbu" viewBox="0 0 300 390" role="img" aria-label="A nimbu-mirchi charm hanging on a string">
+      <defs>
+        <pattern id="htY" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3" cy="3" r="1.3" fill="#E39A00" opacity=".55"/></pattern>
+        <pattern id="htG" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="2.5" cy="2.5" r="1.1" fill="#0B6E20" opacity=".55"/></pattern>
+        <g id="chilli">
+          <path d="M8 -6 C50 -14 104 -10 150 6 C160 10 162 16 156 16 C108 10 52 10 8 8 C0 6 0 -4 8 -6Z" fill="#16C23A" stroke="#5A0020" stroke-width="3.5"/>
+          <path d="M8 -6 C50 -14 104 -10 150 6 C160 10 162 16 156 16 C108 10 52 10 8 8 C0 6 0 -4 8 -6Z" fill="url(#htG)"/>
+          <path d="M20 -5 C60 -10 100 -6 132 2" fill="none" stroke="#B9FFA8" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+          <path d="M8 -6 C2 -8 -4 -4 -2 2 C0 7 6 8 8 8Z" fill="#0E9A2C" stroke="#5A0020" stroke-width="3"/>
+        </g>
+      </defs>
+      <g class="burstbehind" transform="translate(150 205) scale(1.35) translate(-150 -202)">
+        <path d="M150 112 L170 160 L222 132 L198 182 L262 196 L198 214 L226 262 L172 236 L150 292 L128 236 L74 262 L102 214 L38 196 L102 182 L78 132 L130 160Z" fill="#FFD21F" stroke="#E0102F" stroke-width="4" stroke-linejoin="round"/>
+      </g>
+      <g class="swing">
+        <path d="M150 0 V330" stroke="#5A0020" stroke-width="7"/>
+        <path d="M150 0 V330" stroke="#FFD21F" stroke-width="3.5" stroke-dasharray="5 4"/>
+        <g filter="url(#stk)">
+          <!-- top lemon -->
+          <ellipse cx="150" cy="118" rx="40" ry="34" fill="#FFE53B"/>
+          <ellipse cx="150" cy="118" rx="40" ry="34" fill="url(#htY)"/>
+          <path d="M110 118 q-8 -2 -10 -8 q8 -2 12 2Z M190 118 q8 -2 10 -8 q-8 -2 -12 2Z" fill="#FFE53B" stroke="#5A0020" stroke-width="2"/>
+          <ellipse cx="136" cy="104" rx="12" ry="7" fill="#FFFBD0" opacity=".85" transform="rotate(-20 136 104)"/>
+          <!-- chillies fanned from the knot -->
+          <g transform="translate(150 160)">
+            <use href="#chilli" transform="rotate(142) scale(.8 -1.45)"/>
+            <use href="#chilli" transform="rotate(38) scale(.8 1.45)"/>
+            <use href="#chilli" transform="rotate(118) scale(.86 -1.45)"/>
+            <use href="#chilli" transform="rotate(62) scale(.86 1.45)"/>
+            <use href="#chilli" transform="rotate(90) scale(.86 1.5)"/>
+          </g>
+          <!-- bottom lemon -->
+          <ellipse cx="150" cy="324" rx="36" ry="32" fill="#FFE53B"/>
+          <ellipse cx="150" cy="324" rx="36" ry="32" fill="url(#htY)"/>
+          <path d="M150 356 q-6 8 0 12 q6 -4 0 -12Z" fill="#FFE53B" stroke="#5A0020" stroke-width="2"/>
+          <ellipse cx="138" cy="310" rx="10" ry="6" fill="#FFFBD0" opacity=".85" transform="rotate(-20 138 310)"/>
+          <!-- string knots -->
+          <g fill="#FFD21F" stroke="#5A0020" stroke-width="2.5">
+            <ellipse cx="150" cy="160" rx="10" ry="12"/>
+            <ellipse cx="150" cy="84" rx="6" ry="8"/>
+            <ellipse cx="150" cy="290" rx="6" ry="8"/>
+          </g>
+          <path d="M150 0 V84" stroke="#5A0020" stroke-width="5"/>
+          <path d="M150 0 V84" stroke="#FFD21F" stroke-width="2.5" stroke-dasharray="5 4"/>
+        </g>
+      </g>
+      <g fill="#FFD21F" stroke="#E0102F" stroke-width="2">
+        <path d="M40 60 h10 v10 h-10Z M50 50 h10 v10 h-10Z M50 70 h10 v10 h-10Z M60 60 h10 v10 h-10Z"/>
+        <path d="M236 320 h8 v8 h-8Z M244 312 h8 v8 h-8Z M244 328 h8 v8 h-8Z M252 320 h8 v8 h-8Z"/>
+      </g>
+    </svg>
+
+    <div class="because">
+      <p>Because all the</p>
+      <span class="hi" lang="hi">पटाखे</span>
+      <p>will be at our house.</p>
+    </div>
+
+
+    <div class="ticket">
+      <svg class="girl" viewBox="0 0 240 340" aria-hidden="true"><use href="#girlArt"/></svg>
+      <p class="label">You are invited to</p>
+      <h3>Diwali house party</h3>
+      <dl class="facts">
+        <dt>🗓</dt><dd>Thursday, 5th November<small>Diwali week</small></dd>
+        <dt>🕡</dt><dd>6:30 PM onwards<small>Come hungry, leave late</small></dd>
+        <dt>📍</dt><dd>CA4, Salt Lake City<small>Follow the noise</small></dd>
+      </dl>
+    </div>
+
+    <div class="rsvp" id="rsvp">
+      <div id="form">
+        <h3>Are you coming?</h3>
+        <p class="hint">Tell us so we stock enough mithai.</p>
+        <label for="name">Your name</label>
+        <input id="name" type="text" autocomplete="name" placeholder="e.g. Riya" maxlength="60">
+        <label>Will you be there?</label>
+        <div class="seg" role="group" aria-label="Will you be there?">
+          <button type="button" data-go="yes" aria-pressed="true">Yes, obviously</button>
+          <button type="button" data-go="no" aria-pressed="false">Can’t make it</button>
+        </div>
+        <div id="countWrap">
+          <label id="cLbl">How many of you, including you?</label>
+          <div class="step" role="group" aria-labelledby="cLbl">
+            <button type="button" id="minus" aria-label="One fewer">−</button>
+            <output id="count">1</output>
+            <button type="button" id="plus" aria-label="One more">+</button>
+          </div>
+        </div>
+        <button class="cta" id="send" type="button">Count me in</button>
+        <a class="cta alt" id="wa" href="#" target="_blank" rel="noopener" style="display:none">Tell the host on WhatsApp</a>
+        <p class="msg" id="msg" role="status"></p>
+      </div>
+      <div class="done" id="done">
+        <big id="doneTitle">You’re on the list!</big>
+        <p id="doneText">See you on the 5th. Bring your best Diwali outfit.</p>
+        <a class="cta alt" id="wa2" href="#" target="_blank" rel="noopener">Tell the host on WhatsApp</a>
+        <button class="link" id="edit" type="button">Change my RSVP</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="tap">Tap the sky up top for more पटाखे ✨</div>
+      <a class="hostlink" id="hostlink" href="#guests">Host view: see who’s coming</a>
+    </div>
+  </section>
+
+  <!-- ===== GUEST LIST ===== -->
+  <section class="guests" id="guests">
+    <h2>Who’s coming</h2>
+    <div class="tally">
+      <div><b id="tYes">0</b><span>RSVPs in</span></div>
+      <div><b id="tHeads">0</b><span>people total</span></div>
+      <div><b id="tNo">0</b><span>can’t make it</span></div>
+    </div>
+    <ul class="glist" id="glist"></ul>
+    <p class="empty" id="gEmpty">No RSVPs yet. Share the link and they’ll show up here live.</p>
+    <a class="back" href="#">Back to the invite</a>
+  </section>
+</main>
+
+<script>
+(() => {
+"use strict";
+const HOST_WHATSAPP = ""; // e.g. "919812345678" – leave empty to let guests pick a chat
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s) => document.querySelector(s);
+const COLORS = ["#FFD21F","#FF2E93","#E0102F","#16C23A","#FFF6E3","#FF7A00"];
+
+/* starburst rays behind gate */
+(() => {
+  const g = $("#rays"); let s = "";
+  for (let i = 0; i < 24; i++) {
+    const a1 = (i/24)*Math.PI*2, a2 = ((i+0.5)/24)*Math.PI*2;
+    const c = i % 3 === 0 ? "#FFD21F" : i % 3 === 1 ? "#E0102F" : "#FF5FAE";
+    s += `<path d="M0 0 L${Math.cos(a1)*140} ${Math.sin(a1)*140} L${Math.cos(a2)*140} ${Math.sin(a2)*140}Z" fill="${c}" opacity=".55"/>`;
+  }
+  g.innerHTML = s;
+})();
+
+/* ---------- sound ---------- */
+const Sound = (() => {
+  let ac = null, master, comp, musicBus, noiseBuf, timer = null, nextT = 0, step = 0, muted = false;
+  try { muted = localStorage.getItem("diwali-muted") === "1"; } catch (e) {}
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  function init(){
+    if (ac) { if (ac.state === "suspended") ac.resume(); return true; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    ac = new AC();
+    comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6; comp.connect(ac.destination);
+    master = ac.createGain(); master.gain.value = muted ? 0 : 1; master.connect(comp);
+    musicBus = ac.createGain(); musicBus.gain.value = 0; musicBus.connect(master);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+    document.addEventListener("visibilitychange", () => { if (!ac) return; document.hidden ? ac.suspend() : ac.resume(); });
+    return true;
+  }
+  function out(pan){
+    if (ac.createStereoPanner){ const p = ac.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan || 0)); p.connect(master); return p; }
+    return master;
+  }
+  function noise(t, dur, node){ const n = ac.createBufferSource(); n.buffer = noiseBuf; n.loop = true; n.connect(node); n.start(t, Math.random()*1.5); n.stop(t + dur); return n; }
+
+  /* firecracker bang: thump + noisy blast + crackle tail */
+  function bang(size = 1, pan = 0){
+    if (!ac) return;
+    const t = ac.currentTime + .01, o = out(pan);
+    const lp = ac.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.setValueAtTime(3200*size, t); lp.frequency.exponentialRampToValueAtTime(220, t + .5);
+    const g = ac.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.9*size, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + .35 + .45*size);
+    lp.connect(g); g.connect(o); noise(t, 1.2, lp);
+    const th = ac.createOscillator(), tg = ac.createGain(); th.type = "sine";
+    th.frequency.setValueAtTime(120, t); th.frequency.exponentialRampToValueAtTime(34, t + .3);
+    tg.gain.setValueAtTime(.9*size, t); tg.gain.exponentialRampToValueAtTime(.0001, t + .4);
+    th.connect(tg); tg.connect(o); th.start(t); th.stop(t + .45);
+    const ticks = 6 + (Math.random()*10|0);
+    for (let i = 0; i < ticks; i++){
+      const tt = t + .25 + Math.random()*.9, hp = ac.createBiquadFilter(), cg = ac.createGain();
+      hp.type = "highpass"; hp.frequency.value = 2500 + Math.random()*3000;
+      cg.gain.setValueAtTime(.0001, tt); cg.gain.exponentialRampToValueAtTime(.18 + Math.random()*.2, tt + .002); cg.gain.exponentialRampToValueAtTime(.0001, tt + .04);
+      hp.connect(cg); cg.connect(o); noise(tt, .06, hp);
+    }
+  }
+  /* rocket whistle */
+  function whistle(pan = 0){
+    if (!ac) return;
+    const t = ac.currentTime + .01, o = out(pan), os = ac.createOscillator(), g = ac.createGain();
+    os.type = "sine"; os.frequency.setValueAtTime(900, t); os.frequency.exponentialRampToValueAtTime(2300, t + .9);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.05, t + .1); g.gain.exponentialRampToValueAtTime(.0001, t + 1);
+    os.connect(g); g.connect(o); os.start(t); os.stop(t + 1.05);
+  }
+  /* burning wick hiss */
+  function sizzle(){
+    if (!ac) return () => {};
+    const t = ac.currentTime, bp = ac.createBiquadFilter(), g = ac.createGain();
+    bp.type = "bandpass"; bp.frequency.value = 5200; bp.Q.value = .6;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.22, t + .15);
+    bp.connect(g); g.connect(master);
+    const n = noise(t, 30, bp);
+    const flick = setInterval(() => { g.gain.setTargetAtTime(.1 + Math.random()*.22, ac.currentTime, .02); bp.frequency.setTargetAtTime(3500 + Math.random()*4000, ac.currentTime, .03); }, 45);
+    return () => { clearInterval(flick); const e = ac.currentTime; g.gain.setTargetAtTime(0, e, .04); n.stop(e + .3); };
+  }
+
+  /* bhangra loop: dhol (dagga bass + tilli slap), tumbi riff, chimta jingles — 12/8 chaal */
+  const BEAT = 60/138, STEP = BEAT/3;
+  const DHOL = ["X",".","T","B","T","T","X",".","T","B",".","T"];   // X = both heads
+  const TUMBI = [76,0,76, 79,0,76, 74,0,72, 74,0,0, 76,0,76, 79,0,81, 79,0,76, 74,0,0];
+  function dagga(t, v = .9){
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = "sine";
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(52, t + .22);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .45);
+    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + .5);
+    const lp = ac.createBiquadFilter(), ng = ac.createGain(); lp.type = "lowpass"; lp.frequency.value = 900;
+    ng.gain.setValueAtTime(.0001, t); ng.gain.exponentialRampToValueAtTime(.35*v, t + .003); ng.gain.exponentialRampToValueAtTime(.0001, t + .06);
+    lp.connect(ng); ng.connect(musicBus); noise(t, .08, lp);
+  }
+  function tilli(t, v = .5){
+    const bp = ac.createBiquadFilter(), g = ac.createGain(); bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 1.4;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .002); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+    bp.connect(g); g.connect(musicBus); noise(t, .1, bp);
+    const o = ac.createOscillator(), og = ac.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(380, t + .08);
+    og.gain.setValueAtTime(.0001, t); og.gain.exponentialRampToValueAtTime(v*.5, t + .002); og.gain.exponentialRampToValueAtTime(.0001, t + .1);
+    o.connect(og); og.connect(musicBus); o.start(t); o.stop(t + .12);
+  }
+  function tumbi(m, t){
+    const f = mtof(m), o = ac.createOscillator(), bp = ac.createBiquadFilter(), g = ac.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(f*1.02, t); o.frequency.exponentialRampToValueAtTime(f, t + .03);
+    bp.type = "bandpass"; bp.frequency.setValueAtTime(f*3, t); bp.frequency.exponentialRampToValueAtTime(f*1.5, t + .2); bp.Q.value = 6;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.45, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .28);
+    o.connect(bp); bp.connect(g); g.connect(musicBus); o.start(t); o.stop(t + .3);
+  }
+  function chimta(t){
+    const hp = ac.createBiquadFilter(), g = ac.createGain(); hp.type = "highpass"; hp.frequency.value = 6500;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .003); g.gain.exponentialRampToValueAtTime(.0001, t + .12);
+    hp.connect(g); g.connect(musicBus); noise(t, .14, hp);
+  }
+  function schedule(){
+    while (nextT < ac.currentTime + .15){
+      const i = step % 12, j = step % 24;
+      const d = DHOL[i];
+      if (d === "X" || d === "B") dagga(nextT, i === 0 ? 1 : .75);
+      if (d === "X" || d === "T") tilli(nextT, d === "X" ? .55 : .4);
+      if (step >= 24 && TUMBI[j]) tumbi(TUMBI[j], nextT);   // dhol intro for one bar, then tumbi joins
+      if (i % 3 === 0) chimta(nextT);
+      nextT += STEP; step++;
+    }
+  }
+  function start(){
+    if (!init()) return;
+    if (!timer){
+      nextT = ac.currentTime + .1; timer = setInterval(schedule, 40);
+      musicBus.gain.setValueAtTime(0, ac.currentTime); musicBus.gain.linearRampToValueAtTime(.5, ac.currentTime + 1.2);
+    }
+    showMute();
+  }
+  function setMuted(m){
+    muted = m; try { localStorage.setItem("diwali-muted", m ? "1" : "0"); } catch (e) {}
+    if (ac) master.gain.setTargetAtTime(m ? 0 : 1, ac.currentTime, .05);
+    const b = $("#mute"); b.textContent = m ? "🔇" : "🔊"; b.setAttribute("aria-label", m ? "Turn sound on" : "Mute sound");
+  }
+  function showMute(){ const b = $("#mute"); b.hidden = false; setMuted(muted); }
+  return { start, bang, whistle, sizzle, toggle: () => { start(); setMuted(!muted); } };
+})();
+$("#mute").addEventListener("click", () => Sound.toggle());
+
+/* ---------- fireworks ---------- */
+const cv = $("#fx"), ctx = cv.getContext("2d");
+let W, H, dpr, parts = [], rockets = [], running = false;
+function size(){ dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+size(); addEventListener("resize", size);
+function burst(x, y, n = 70, pal, quiet){
+  if (!quiet) Sound.bang(Math.min(1.3, n/90), x/W*2-1);
+  const cols = pal || [COLORS[Math.random()*COLORS.length|0], COLORS[Math.random()*COLORS.length|0]];
+  const ring = Math.random() < .35;
+  for (let i = 0; i < n; i++){
+    const a = Math.random()*Math.PI*2, sp = ring ? 6.5 + Math.random()*.6 : Math.random()*7.5 + 1.2;
+    parts.push({x, y, px:x, py:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:1, decay:.026 + Math.random()*.02, c:cols[i%cols.length], w:Math.random()*2+1.6, tw:Math.random()<.3});
+  }
+  kick();
+}
+function rocket(){
+  const x = W*(.15 + Math.random()*.7);
+  Sound.whistle(x/W*2-1);
+  const lim = skyLimit();
+  rockets.push({x, y:Math.min(H+10, lim+10), vy:-(15 + Math.random()*4), ty:Math.max(30, lim*(.15 + Math.random()*.4)), c:COLORS[Math.random()*4|0]});
+  kick();
+}
+function ember(x, y){
+  for (let i = 0; i < 6; i++){
+    const a = -Math.PI/2 + (Math.random()-.5)*2.6, sp = Math.random()*3 + 1;
+    parts.push({x, y, px:x, py:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:.9, decay:.03 + Math.random()*.03, c:["#FFF6E3","#FFD21F","#FF7A00"][i%3], w:Math.random()*2+1.6, tw:true});
+  }
+  kick();
+}
+function kick(){ if (!running){ running = true; requestAnimationFrame(tick); } }
+function skyLimit(){
+  if (!opened) return H;
+  const n = document.querySelector(".nimbu");
+  return n ? Math.max(0, Math.min(H, n.getBoundingClientRect().bottom)) : H;
+}
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, skyLimit()); ctx.clip();
+  ctx.lineCap = "round";
+  for (let i = rockets.length-1; i >= 0; i--){
+    const r = rockets[i]; r.y += r.vy; r.vy *= .97;
+    ctx.strokeStyle = r.c; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x, r.y - r.vy*3); ctx.stroke();
+    if (r.y <= r.ty || r.vy > -2.5){ rockets.splice(i,1); burst(r.x, r.y, 55); }
+  }
+  for (let i = parts.length-1; i >= 0; i--){
+    const p = parts[i]; p.px = p.x; p.py = p.y;
+    p.vx *= .94; p.vy = p.vy*.94 + .14; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+    if (p.life <= 0){ parts.splice(i,1); continue; }
+    if (p.tw && Math.random() < .3) continue;
+    ctx.globalAlpha = Math.max(p.life,0);
+    ctx.strokeStyle = p.c; ctx.lineWidth = p.w;
+    ctx.beginPath(); ctx.moveTo(p.px - p.vx*2, p.py - p.vy*2); ctx.lineTo(p.x, p.y); ctx.stroke();
+  }
+  ctx.globalAlpha = 1; ctx.restore();
+  if (parts.length || rockets.length) requestAnimationFrame(tick); else { running = false; ctx.clearRect(0,0,W,H); }
+}
+function finale(){
+  if (reduce) return;
+  const sky = () => { const l = skyLimit(); return { x: W*(.15 + Math.random()*.7), y: Math.max(40, l*(.15 + Math.random()*.45)) }; };
+  [500, 1100, 1700].forEach((t,i) => setTimeout(() => { if (i === 1) rocket(); else { const p = sky(); burst(p.x, p.y, 60); } }, t));
+  setInterval(() => { if (!document.hidden && skyLimit() > 160 && Math.random() < .6) rocket(); }, 4500);
+}
+
+/* ---------- gate ---------- */
+let opened = false;
+function openInvite(){
+  if (opened) return; opened = true;
+  const fl = $("#flash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+  $("#gate").classList.add("gone");
+  setTimeout(() => {
+    $("#gate").style.display = "none";
+    const inv = $("#invite"); inv.classList.add("on","reveal");
+    scrollTo(0,0);
+  }, reduce ? 0 : 380);
+  finale();
+}
+function braidDash(left, L){
+  const n = Math.floor(left/10), rem = left - n*10;
+  return "4 6 ".repeat(n) + `${Math.min(rem,4)} ${L}`;
+}
+$("#btnPataka").addEventListener("click", (e) => {
+  const btn = e.currentTarget; if (btn.classList.contains("busy")) return;
+  btn.classList.add("busy");
+  Sound.start();
+  const svg = $("#crackerSvg"), path = $("#fuse"), braid = $("#fuseBraid"), base = $("#fuseBase"), spark = $("#spark");
+  const L = path.getTotalLength();
+  if (reduce){ Sound.bang(1.4, 0); setTimeout(openInvite, 250); return; }
+  spark.setAttribute("opacity","1");
+  const stopSizzle = Sound.sizzle();
+  const dur = 2600, t0 = performance.now();
+  (function step(now){
+    const k = Math.min((now - t0)/dur, 1);
+    const left = L*(1-k);
+    const pt = path.getPointAtLength(left);
+    spark.setAttribute("transform", `translate(${pt.x} ${pt.y}) rotate(${now/2%360}) scale(${.85+Math.random()*.5})`);
+    path.setAttribute("stroke-dasharray", `${left} ${L}`);
+    base.setAttribute("stroke-dasharray", `${left} ${L}`);
+    braid.setAttribute("stroke-dasharray", braidDash(left, L));
+    const m = svg.getScreenCTM();
+    if (m){ const sp = new DOMPoint(pt.x, pt.y).matrixTransform(m); ember(sp.x, sp.y); }
+    if (k < 1) requestAnimationFrame(step);
+    else {
+      spark.setAttribute("opacity","0"); stopSizzle();
+      btn.classList.add("boom");
+      setTimeout(() => {
+        const r = svg.getBoundingClientRect();
+        Sound.bang(1.6, 0); burst(r.left + r.width/2, r.top + r.height*.7, 110, ["#FFD21F","#FFF6E3","#FF7A00"], true);
+        openInvite();
+      }, 450);
+    }
+  })(t0);
+});
+/* tap for bursts */
+document.addEventListener("pointerdown", (e) => {
+  if (!opened || reduce) return;
+  if (e.target.closest("button, input, a, .rsvp")) return;
+  if (e.clientY > skyLimit()) return;
+  burst(e.clientX, e.clientY, 50);
+});
+
+/* ---------- RSVP ---------- */
+let going = "yes", count = 1, db = null, user = null, uid = null, canWrite = true;
+const segBtns = document.querySelectorAll(".seg button");
+segBtns.forEach(b => b.addEventListener("click", () => {
+  going = b.dataset.go;
+  segBtns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  $("#countWrap").style.display = going === "yes" ? "" : "none";
+  $("#send").textContent = going === "yes" ? "Count me in" : "Send my regrets";
+  updateWa();
+}));
+const setCount = (n) => { count = Math.max(1, Math.min(10, n)); $("#count").textContent = count; updateWa(); };
+$("#minus").addEventListener("click", () => setCount(count-1));
+$("#plus").addEventListener("click", () => setCount(count+1));
+$("#name").addEventListener("input", updateWa);
+
+function waText(){
+  const n = $("#name").value.trim() || "Me";
+  return going === "yes"
+    ? `🪔 RSVP: ${n} is coming to the Diwali house party (5 Nov, CA4 Salt Lake City, 6:30 PM)! Total: ${count} ${count>1?"people":"person"}. No buri nazar 🍋🌶️`
+    : `🪔 RSVP: ${n} can’t make it to the Diwali house party on 5 Nov. Have a blast! 🎆`;
+}
+function waHref(){ const t = encodeURIComponent(waText()); return HOST_WHATSAPP ? `https://wa.me/${HOST_WHATSAPP}?text=${t}` : `https://wa.me/?text=${t}`; }
+function updateWa(){ $("#wa").href = waHref(); $("#wa2").href = waHref(); }
+updateWa();
+/* standalone hosting: no Claude runtime, so RSVP goes straight to WhatsApp */
+if (!window.claude){ $("#send").style.display = "none"; $("#wa").style.display = "block"; }
+
+function showDone(){
+  const n = $("#name").value.trim();
+  $("#doneTitle").textContent = going === "yes" ? `You’re on the list, ${n}!` : `Noted, ${n}. We’ll miss you!`;
+  $("#doneText").textContent = going === "yes"
+    ? (count > 1 ? `${count} of you, 5th November, 6:30 PM at CA4, Salt Lake City. See you there.` : `5th November, 6:30 PM at CA4, Salt Lake City. See you there.`)
+    : `If plans change, come back and update your RSVP.`;
+  $("#form").style.display = "none"; $("#done").classList.add("on");
+}
+function fallbackToWhatsApp(text){
+  canWrite = false;
+  $("#send").style.display = "none";
+  $("#wa").style.display = "block";
+  $("#msg").textContent = text;
+}
+
+$("#send").addEventListener("click", async () => {
+  const name = $("#name").value.trim();
+  if (!name){ $("#msg").textContent = "Add your name first so the host knows who’s coming."; $("#name").focus(); return; }
+  if (!db || !uid){ fallbackToWhatsApp("This link can’t save RSVPs on your account, so send it on WhatsApp instead."); return; }
+  $("#send").disabled = true; $("#msg").textContent = "Saving…";
+  try {
+    await db.doc("rsvps/" + uid).set({ name, going, count: going === "yes" ? count : 0, at: new Date().toISOString() });
+    $("#msg").textContent = "";
+    showDone();
+    if (going === "yes") Sound.bang(1, 0);
+  } catch (err) {
+    fallbackToWhatsApp("Your RSVP couldn’t be saved here. Send it to the host on WhatsApp instead.");
+  } finally { $("#send").disabled = false; }
+});
+$("#edit").addEventListener("click", () => { $("#done").classList.remove("on"); $("#form").style.display = ""; });
+
+/* ---------- guest list ---------- */
+let unsub = null;
+function route(){
+  const host = location.hash === "#guests";
+  $("#guests").classList.toggle("on", host);
+  if (host){ $("#gate").style.display = "none"; $("#invite").classList.remove("on"); startGuests(); }
+  else if (opened){ $("#invite").classList.add("on"); }
+  else { $("#gate").style.display = ""; }
+}
+addEventListener("hashchange", route);
+async function startGuests(){
+  if (unsub) return;
+  const list = $("#glist"), empty = $("#gEmpty");
+  if (!db){ empty.textContent = "The guest list opens for the host inside Claude. Open this page from your Claude account to see it."; return; }
+  const admin = user ? await user.canEdit() : false;
+  if (!admin){ empty.textContent = "Only the host can see the guest list."; return; }
+  unsub = db.collection("rsvps").onSnapshot((snap) => {
+    const rows = snap.docs.map(d => d.data()).filter(Boolean).sort((a,b) => (a.going === b.going ? (a.at < b.at ? 1 : -1) : a.going === "yes" ? -1 : 1));
+    const yes = rows.filter(r => r.going === "yes");
+    $("#tYes").textContent = yes.length;
+    $("#tHeads").textContent = yes.reduce((s,r) => s + (Number(r.count)||1), 0);
+    $("#tNo").textContent = rows.length - yes.length;
+    list.replaceChildren(...rows.map(r => {
+      const li = document.createElement("li"); if (r.going !== "yes") li.className = "no";
+      const left = document.createElement("div");
+      const n = document.createElement("div"); n.className = "n"; n.textContent = String(r.name || "Someone");
+      const m = document.createElement("div"); m.className = "m"; m.textContent = r.at ? new Date(r.at).toLocaleString([], {day:"numeric", month:"short", hour:"numeric", minute:"2-digit"}) : "";
+      left.append(n, m);
+      const b = document.createElement("span"); b.className = "badge";
+      b.textContent = r.going === "yes" ? `Coming${Number(r.count) > 1 ? " · " + r.count : ""}` : "Can’t come";
+      li.append(left, b); return li;
+    }));
+    empty.style.display = rows.length ? "none" : "";
+  }, () => { empty.textContent = "The guest list couldn’t load. Reopen the page to try again."; });
+}
+
+/* ---------- connect to Claude runtime ---------- */
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (user){
+      uid = await user.id();
+      if (await user.isOwner()) $("#hostlink").classList.add("on");
+    }
+    if (db && uid){
+      const s = await db.doc("rsvps/" + uid).get();
+      const d = s.exists ? s.data() : null;
+      if (d && d.name){
+        $("#name").value = d.name;
+        going = d.going === "no" ? "no" : "yes";
+        segBtns.forEach(x => x.setAttribute("aria-pressed", x.dataset.go === going ? "true" : "false"));
+        $("#countWrap").style.display = going === "yes" ? "" : "none";
+        setCount(Number(d.count) || 1);
+        showDone();
+      }
+    }
+    if (location.hash === "#guests") startGuests();
+  } catch (e) { /* page still works; RSVP falls back to WhatsApp */ }
+})();
+route();
+})();
+</script>
+</body>
+</html>
