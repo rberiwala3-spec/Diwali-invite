@@ -443,13 +443,11 @@ canvas#fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none;
           </div>
         </div>
         <button class="cta" id="send" type="button">Count me in</button>
-        <a class="cta alt" id="wa" href="#" target="_blank" rel="noopener" style="display:none">Tell the host on WhatsApp</a>
         <p class="msg" id="msg" role="status"></p>
       </div>
       <div class="done" id="done">
         <big id="doneTitle">You’re on the list!</big>
         <p id="doneText">See you on the 5th. Bring your best Diwali outfit.</p>
-        <a class="cta alt" id="wa2" href="#" target="_blank" rel="noopener">Tell the host on WhatsApp</a>
         <button class="link" id="edit" type="button">Change my RSVP</button>
       </div>
     </div>
@@ -477,7 +475,7 @@ canvas#fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none;
 <script>
 (() => {
 "use strict";
-const HOST_WHATSAPP = ""; // e.g. "919812345678" – leave empty to let guests pick a chat
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxgry58iu6UxZ7IJdMdzzJs9J19lybo2X5ydr8mMH9eKUnmr810M3f9wl4ozWhqifIh/exec"; // paste your Google Apps Script web app URL (ends in /exec) between the quotes // e.g. "919812345678" – leave empty to let guests pick a chat
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (s) => document.querySelector(s);
 const COLORS = ["#FFD21F","#FF2E93","#E0102F","#16C23A","#FFF6E3","#FF7A00"];
@@ -745,24 +743,10 @@ segBtns.forEach(b => b.addEventListener("click", () => {
   segBtns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
   $("#countWrap").style.display = going === "yes" ? "" : "none";
   $("#send").textContent = going === "yes" ? "Count me in" : "Send my regrets";
-  updateWa();
 }));
-const setCount = (n) => { count = Math.max(1, Math.min(10, n)); $("#count").textContent = count; updateWa(); };
+const setCount = (n) => { count = Math.max(1, Math.min(10, n)); $("#count").textContent = count; };
 $("#minus").addEventListener("click", () => setCount(count-1));
 $("#plus").addEventListener("click", () => setCount(count+1));
-$("#name").addEventListener("input", updateWa);
-
-function waText(){
-  const n = $("#name").value.trim() || "Me";
-  return going === "yes"
-    ? `🪔 RSVP: ${n} is coming to the Diwali house party (5 Nov, CA4 Salt Lake City, 6:30 PM)! Total: ${count} ${count>1?"people":"person"}. No buri nazar 🍋🌶️`
-    : `🪔 RSVP: ${n} can’t make it to the Diwali house party on 5 Nov. Have a blast! 🎆`;
-}
-function waHref(){ const t = encodeURIComponent(waText()); return HOST_WHATSAPP ? `https://wa.me/${HOST_WHATSAPP}?text=${t}` : `https://wa.me/?text=${t}`; }
-function updateWa(){ $("#wa").href = waHref(); $("#wa2").href = waHref(); }
-updateWa();
-/* standalone hosting: no Claude runtime, so RSVP goes straight to WhatsApp */
-if (!window.claude){ $("#send").style.display = "none"; $("#wa").style.display = "block"; }
 
 function showDone(){
   const n = $("#name").value.trim();
@@ -772,17 +756,23 @@ function showDone(){
     : `If plans change, come back and update your RSVP.`;
   $("#form").style.display = "none"; $("#done").classList.add("on");
 }
-function fallbackToWhatsApp(text){
-  canWrite = false;
-  $("#send").style.display = "none";
-  $("#wa").style.display = "block";
-  $("#msg").textContent = text;
-}
+function saveFailed(text){ $("#msg").textContent = text; }
 
 $("#send").addEventListener("click", async () => {
   const name = $("#name").value.trim();
   if (!name){ $("#msg").textContent = "Add your name first so the host knows who’s coming."; $("#name").focus(); return; }
-  if (!db || !uid){ fallbackToWhatsApp("This link can’t save RSVPs on your account, so send it on WhatsApp instead."); return; }
+  if (SHEET_URL && !(db && uid)){
+    $("#send").disabled = true; $("#msg").textContent = "Saving…";
+    try {
+      await fetch(SHEET_URL, { method: "POST", mode: "no-cors", body: new URLSearchParams({ name, going, count: String(going === "yes" ? count : 0) }) });
+      $("#msg").textContent = ""; showDone();
+      if (going === "yes") Sound.bang(1, 0);
+    } catch (err) {
+      saveFailed("Your RSVP couldn’t be saved. Check your internet connection and tap the button again.");
+    } finally { $("#send").disabled = false; }
+    return;
+  }
+  if (!db || !uid){ saveFailed("RSVPs aren’t switched on for this invite yet. Ask the host to check the link."); return; }
   $("#send").disabled = true; $("#msg").textContent = "Saving…";
   try {
     await db.doc("rsvps/" + uid).set({ name, going, count: going === "yes" ? count : 0, at: new Date().toISOString() });
@@ -790,7 +780,7 @@ $("#send").addEventListener("click", async () => {
     showDone();
     if (going === "yes") Sound.bang(1, 0);
   } catch (err) {
-    fallbackToWhatsApp("Your RSVP couldn’t be saved here. Send it to the host on WhatsApp instead.");
+    saveFailed("Your RSVP couldn’t be saved. Check your internet connection and tap the button again.");
   } finally { $("#send").disabled = false; }
 });
 $("#edit").addEventListener("click", () => { $("#done").classList.remove("on"); $("#form").style.display = ""; });
@@ -853,7 +843,7 @@ async function startGuests(){
       }
     }
     if (location.hash === "#guests") startGuests();
-  } catch (e) { /* page still works; RSVP falls back to WhatsApp */ }
+  } catch (e) { /* page still works without the Claude runtime */ }
 })();
 route();
 })();
